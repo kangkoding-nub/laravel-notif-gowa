@@ -44,12 +44,12 @@ class GowaChannel
     protected function sendMessage(string $recipient, GowaMessage $message): void
     {
         $params = [
-            'to'        => $recipient,
-            'body'      => $message->content,
+            'to'   => preg_replace('/[^0-9]/', '', $recipient),
+            'body' => $message->content,
         ];
 
         if ($message->sendAt instanceof DateTimeInterface) {
-            $params['time'] = '0'.$message->sendAt->getTimestamp();
+            $params['time'] = $message->sendAt->getTimestamp();
         }
 
         $this->gowa->send($params);

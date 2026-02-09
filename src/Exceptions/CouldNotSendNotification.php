@@ -36,7 +36,7 @@ class CouldNotSendNotification extends Exception
      *
      * @return static
      */
-    public static function exceptionWahaRespondedWithAnError(DomainException $exception): static
+    public static function exceptionGowaRespondedWithAnError(DomainException $exception): static
     {
         return new static(
             "Gowa merespons dengan kesalahan '{$exception->getCode()}: {$exception->getMessage()}'"
@@ -44,13 +44,13 @@ class CouldNotSendNotification extends Exception
     }
 
     /**
-     * Thrown when we're unable to communicate with smsc.ru.
+     * Thrown when we're unable to communicate with GOWA.
      *
      * @param  Exception  $exception
      *
      * @return static
      */
-    public static function couldNotCommunicateWithWaha(Exception $exception): static
+    public static function couldNotCommunicateWithGowa(Exception $exception): static
     {
         return new static("Komunikasi dengan GOWA gagal. Alasan: {$exception->getMessage()}");
     }

@@ -4,7 +4,7 @@
          bootstrap="vendor/autoload.php"
          colors="true">
     <testsuites>
-        <testsuite name="shiroamada/UltraSms Test Suite">
+        <testsuite name="Gowa Notification Channel Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

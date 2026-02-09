@@ -19,15 +19,14 @@ class GowaApi
 
     public function __construct($config)
     {
-        $this->apiUrl   = $config['apiUrl'];
-        $this->username = $config['username'];
-        $this->password = $config['password'];
+        $this->apiUrl   = rtrim($config['apiUrl'] ?? '', '/');
+        $this->username = $config['username'] ?? '';
+        $this->password = $config['password'] ?? '';
 
-        $this->isEnable = ($config['isEnable'] ?? 0);
-
+        $this->isEnable = (bool) ($config['isEnable'] ?? false);
 
         $this->httpClient = new HttpClient([
-            'base_uri' =>  $this->apiUrl.'/send/'.$this->action,
+            'base_uri' =>  $this->apiUrl . '/send/' . $this->action,
             'timeout' => 8.0,
         ]);
     }
@@ -35,33 +34,41 @@ class GowaApi
     /**
      * @param  array  $params
      *
-     * @return array
+     * @return array|null
      *
      * @throws CouldNotSendNotification|GuzzleException
      */
-    public function send(array $params)
+    public function send(array $params): ?array
     {
-        if($this->isEnable)
-        {
+        if ($this->isEnable) {
             try {
+                $payload = [
+                    'phone' => preg_replace('/[^0-9]/', '', $params['to']) . '@s.whatsapp.net',
+                    'message' => $params['body'],
+                    "is_forwarded" => false,
+                    "duration" => 3600
+                ];
+
+                if (isset($params['time'])) {
+                    $payload['time'] = $params['time'];
+                }
+
                 $response = $this->httpClient->post('', [
                     'auth' => [$this->username, $this->password],
-                    'json' => [
-                        'phone' => $params['to'].'@s.whatsapp.net',
-                        'message' => $params['body'],
-                        "is_forwarded" => false,
-                        "duration" => 3600
-                    ],
+                    'json' => $payload,
                     'headers' => [
                         'Accept' => 'application/json',
                     ]
                 ]);
+
                 return json_decode((string) $response->getBody(), true);
             } catch (DomainException $exception) {
-                throw CouldNotSendNotification::exceptionWahaRespondedWithAnError($exception);
+                throw CouldNotSendNotification::exceptionGowaRespondedWithAnError($exception);
             } catch (\Exception $exception) {
-                throw CouldNotSendNotification::couldNotCommunicateWithWaha($exception);
+                throw CouldNotSendNotification::couldNotCommunicateWithGowa($exception);
             }
         }
+
+        return null;
     }
 }

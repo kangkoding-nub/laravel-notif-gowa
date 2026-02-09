@@ -13,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class GowaChannelTest extends TestCase
 {
+    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
     private GowaApi $gowa;
     private GowaMessage $message;
     private GowaChannel $channel;
@@ -45,10 +47,10 @@ class GowaChannelTest extends TestCase
         $this->gowa->shouldReceive('send')->once()
             ->with(
                 [
-                    'to'    => '6282229366506',
+                    'to'    => '6202229366506',
                     'body'  => 'hello',
                 ]
-            )->andReturn(true);
+            )->andReturn([]);
         $this->channel->send(new TestNotifiable(), new TestNotification());
     }
 
@@ -60,11 +62,11 @@ class GowaChannelTest extends TestCase
         $this->gowa->shouldReceive('send')->once()
             ->with(
                 [
-                    'to'    => '60123456789',
+                    'to'    => '6202229366506',
                     'body'  => 'hello',
-                    'time'  => '0'.self::$sendAt->getTimestamp(),
+                    'time'  => self::$sendAt->getTimestamp(),
                 ]
-            )->andReturn(true);
+            )->andReturn([]);
 
         $this->channel->send(new TestNotifiable(), new TestNotificationWithSendAt());
     }
@@ -75,7 +77,7 @@ class GowaChannelTest extends TestCase
         $this->expectException(CouldNotSendNotification::class);
 
         $this->channel->send(
-            new TestNotifiableWithoutRouteNotificationForSmscru(), new TestNotification()
+            new TestNotifiableWithoutRouteNotificationForGowa(), new TestNotification()
         );
     }
 }
@@ -88,11 +90,11 @@ class TestNotifiable
     }
 }
 
-class TestNotifiableWithoutRouteNotificationForSmscru extends TestNotifiable
+class TestNotifiableWithoutRouteNotificationForGowa extends TestNotifiable
 {
     public function routeNotificationFor(): string
     {
-        return false;
+        return '';
     }
 }
 
